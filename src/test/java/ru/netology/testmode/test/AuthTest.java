@@ -1,9 +1,14 @@
 package ru.netology.testmode.test;
 
+import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 import static ru.netology.testmode.data.DataGenerator.Registration.getRegisteredUser;
@@ -25,6 +30,7 @@ class AuthTest {
         $("[data-test-id='login'] input").sendKeys(registeredUser.getLogin());
         $("[data-test-id='password'] input").sendKeys(registeredUser.getPassword());
         $("[data-test-id='action-login'] span").click();
+        $(withText("Личный кабинет")).shouldBe(visible, Duration.ofSeconds(15));
     }
 
     @Test
@@ -34,7 +40,9 @@ class AuthTest {
         $("[data-test-id='login'] input").sendKeys(notRegisteredUser.getLogin());
         $("[data-test-id='password'] input").sendKeys(notRegisteredUser.getPassword());
         $("[data-test-id='action-login'] span").click();
-    }
+        $(withText("Ошибка!")).shouldBe(visible, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.text("Ошибка! Неверно указан логин или пароль"));
+            }
 
     @Test
     @DisplayName("Should get error message if login with blocked registered user")
@@ -43,6 +51,8 @@ class AuthTest {
         $("[data-test-id='login'] input").sendKeys(blockedUser.getLogin());
         $("[data-test-id='password'] input").sendKeys(blockedUser.getPassword());
         $("[data-test-id='action-login'] span").click();
+        $(withText("Ошибка!")).shouldBe(visible, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.text("Ошибка! Пользователь заблокирован"));
     }
 
     @Test
@@ -54,6 +64,8 @@ class AuthTest {
         $("[data-test-id='login'] input").sendKeys(wrongLogin);
         $("[data-test-id='password'] input").sendKeys(registeredUser.getPassword());
         $("[data-test-id='action-login'] span").click();
+        $(withText("Ошибка!")).shouldBe(visible, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.text("Ошибка! Неверно указан логин или пароль"));
     }
 
     @Test
@@ -65,5 +77,8 @@ class AuthTest {
         $("[data-test-id='login'] input").sendKeys(registeredUser.getLogin());
         $("[data-test-id='password'] input").sendKeys(wrongPassword);
         $("[data-test-id='action-login'] span").click();
+        $(withText("Ошибка!")).shouldBe(visible, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.text("Ошибка! Неверно указан логин или пароль"));
+
     }
 }
